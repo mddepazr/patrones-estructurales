@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patrones Estructurales - Grupo 2</title>
+    <!-- Tailwind CSS para diseño responsivo y minimalista -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PrismJS para resaltado de sintaxis Java -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            bg: '#fdfbf7',
+                            card: '#ffffff',
+                            green: '#d1e8e2',
+                            blue: '#d4e4ff',
+                            purple: '#e2d4ff',
+                            yellow: '#fef1d2',
+                            pink: '#ffd4e5'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Estilos adicionales para UI limpia */
+        body { background-color: #fdfbf7; color: #333; }
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01); }
+        .console-output { font-family: 'Courier New', Courier, monospace; }
+        .image-placeholder { background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-weight: 500; }
+        /* Animación suave al cambiar de página */
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-gray-800 flex flex-col min-h-screen">
+
+    <!-- Header y Navegación -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="text-center sm:text-left">
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Patrones Estructurales</h1>
+            </div>
+            
+            <!-- Menú de Sub-páginas -->
+            <nav class="flex space-x-1 sm:space-x-2 overflow-x-auto pb-2 sm:pb-0 w-full sm:w-auto justify-start sm:justify-end">
+                <button onclick="showPage('adapter')" id="btn-adapter" class="nav-btn active whitespace-nowrap px-4 py-2 text-sm font-medium rounded-full bg-teal-600 text-white shadow-md transition-all">Adapter</button>
+                <button onclick="showPage('bridge')" id="btn-bridge" class="nav-btn whitespace-nowrap px-4 py-2 text-sm font-medium rounded-full text-gray-600 hover:bg-gray-100 transition-all">Bridge</button>
+                <button onclick="showPage('composite')" id="btn-composite" class="nav-btn whitespace-nowrap px-4 py-2 text-sm font-medium rounded-full text-gray-600 hover:bg-gray-100 transition-all">Composite</button>
+                <button onclick="showPage('decorator')" id="btn-decorator" class="nav-btn whitespace-nowrap px-4 py-2 text-sm font-medium rounded-full text-gray-600 hover:bg-gray-100 transition-all">Decorator</button>
+                <button onclick="showPage('facade')" id="btn-facade" class="nav-btn whitespace-nowrap px-4 py-2 text-sm font-medium rounded-full text-gray-600 hover:bg-gray-100 transition-all">Facade</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-5xl mx-auto px-4 py-10 sm:px-6 lg:px-8 w-full flex-grow">
+
+        <!-- SUB-PÁGINA 1: Adapter -->
+        <section id="page-adapter" class="page-section fade-in">
+            <div class="bg-white rounded-3xl overflow-hidden card-shadow border border-gray-100 lg:flex">
+                <div class="lg:w-1/3 bg-pastel-green p-6 flex flex-col justify-center">
+                    <h2 class="text-3xl font-bold text-teal-900 mb-4">1. Adapter</h2>
+                    <div class="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <img src="adapter.png" alt="Ilustración del patrón Adapter" class="object-cover w-full h-full" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="image-placeholder w-full h-64 lg:h-full hidden">adapter.png</div>
+                    </div>
+                </div>
+                <div class="lg:w-2/3 p-6 sm:p-10">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold mb-2">Explicación del Código</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm sm:text-base">
+                            <strong>¿Qué hace?</strong> Tenemos un sistema europeo que espera un enchufe de clavija fina (`EnchufeEuropeo`), pero solo tenemos uno americano (`EnchufeAmericano`). El `AdaptadorAmericanoAEuropeo` implementa la interfaz europea pero internamente llama al método del enchufe americano.<br><br>
+                            <strong>¿Cómo aplica el patrón?</strong> Convierte la interfaz de una clase existente (el enchufe americano) en la interfaz que el cliente espera (la europea), logrando que ambos trabajen juntos sin modificar el código original del enchufe americano.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gray-900 rounded-xl overflow-hidden">
+<pre><code class="language-java">// Interfaz esperada
+interface EnchufeEuropeo { void conectarFino(); }
+
+// Clase incompatible existente
+class EnchufeAmericano { 
+    void conectarGrueso() { System.out.println("Conectado con clavijas planas"); } 
+}
+
+// El Adaptador
+class AdaptadorAmericanoAEuropeo implements EnchufeEuropeo {
+    EnchufeAmericano enchufe = new EnchufeAmericano();
+    
+    public void conectarFino() {
+        enchufe.conectarGrueso(); // Traduce la llamada
+    }
+}</code></pre>
+                    </div>
+                    <div class="mt-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Consola de Salida</span>
+                            <button onclick="ejecutarCodigo('adapter', 'Conectado con clavijas planas')" class="bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium py-1.5 px-4 rounded-lg transition-colors shadow-sm">
+                                Ejecutar
+                            </button>
+                        </div>
+                        <div id="out-adapter" class="console-output text-sm text-gray-800 min-h-[1.5rem] whitespace-pre-wrap">Esperando ejecución...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SUB-PÁGINA 2: Bridge -->
+        <section id="page-bridge" class="page-section hidden fade-in">
+            <div class="bg-white rounded-3xl overflow-hidden card-shadow border border-gray-100 lg:flex lg:flex-row-reverse">
+                <div class="lg:w-1/3 bg-pastel-blue p-6 flex flex-col justify-center">
+                    <h2 class="text-3xl font-bold text-blue-900 mb-4">2. Bridge</h2>
+                    <div class="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <img src="bridge.png" alt="Ilustración del patrón Bridge" class="object-cover w-full h-full" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="image-placeholder w-full h-64 lg:h-full hidden">bridge.png</div>
+                    </div>
+                </div>
+                <div class="lg:w-2/3 p-6 sm:p-10">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold mb-2">Explicación del Código</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm sm:text-base">
+                            <strong>¿Qué hace?</strong> Separa el control remoto (la abstracción) del dispositivo electrónico, como una TV (la implementación). El control remoto tiene una referencia al dispositivo, actuando como un puente.<br><br>
+                            <strong>¿Cómo aplica el patrón?</strong> Desacopla la interfaz del control remoto de la implementación de la TV. Si mañana inventamos un "Control Remoto Avanzado" o agregamos una "Radio", podemos combinarlos sin tener que crear clases como `ControlBasicoParaTV` o `ControlAvanzadoParaRadio`. Evolucionan por separado.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gray-900 rounded-xl overflow-hidden">
+<pre><code class="language-java">// Implementación
+interface Dispositivo { void encender(); }
+class TV implements Dispositivo { 
+    public void encender() { System.out.println("TV Encendida"); } 
+}
+
+// Abstracción (El Puente)
+abstract class ControlRemoto {
+    protected Dispositivo dispositivo; 
+    ControlRemoto(Dispositivo d) { this.dispositivo = d; }
+    abstract void presionarBoton();
+}
+
+class ControlBasico extends ControlRemoto {
+    ControlBasico(Dispositivo d) { super(d); }
+    void presionarBoton() { dispositivo.encender(); }
+}</code></pre>
+                    </div>
+                    <div class="mt-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Consola de Salida</span>
+                            <button onclick="ejecutarCodigo('bridge', 'TV Encendida')" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1.5 px-4 rounded-lg transition-colors shadow-sm">
+                                Ejecutar
+                            </button>
+                        </div>
+                        <div id="out-bridge" class="console-output text-sm text-gray-800 min-h-[1.5rem] whitespace-pre-wrap">Esperando ejecución...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SUB-PÁGINA 3: Composite -->
+        <section id="page-composite" class="page-section hidden fade-in">
+            <div class="bg-white rounded-3xl overflow-hidden card-shadow border border-gray-100 lg:flex">
+                <div class="lg:w-1/3 bg-pastel-yellow p-6 flex flex-col justify-center">
+                    <h2 class="text-3xl font-bold text-yellow-900 mb-4">3. Composite</h2>
+                    <div class="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <img src="composite.png" alt="Ilustración del patrón Composite" class="object-cover w-full h-full" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="image-placeholder w-full h-64 lg:h-full hidden">composite.png</div>
+                    </div>
+                </div>
+                <div class="lg:w-2/3 p-6 sm:p-10">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold mb-2">Explicación del Código</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm sm:text-base">
+                            <strong>¿Qué hace?</strong> Modela un sistema de archivos. Un `Archivo` es un elemento individual y una `Carpeta` es un contenedor que puede tener archivos u otras carpetas. Ambos implementan `ComponenteSistema`.<br><br>
+                            <strong>¿Cómo aplica el patrón?</strong> Permite que el sistema trate un objeto individual (archivo) y un grupo de objetos (carpeta) de manera idéntica. Al llamar a `mostrarDatos()` en una carpeta, esta llama recursivamente al mismo método en todo su contenido, resolviendo la complejidad jerárquica de forma elegante.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gray-900 rounded-xl overflow-hidden">
+<pre><code class="language-java">interface ComponenteSistema { void mostrarDatos(); }
+
+class Archivo implements ComponenteSistema {
+    public void mostrarDatos() { System.out.println("  - Archivo.txt"); }
+}
+
+class Carpeta implements ComponenteSistema {
+    List&lt;ComponenteSistema&gt; hijos = new ArrayList&lt;&gt;();
+    void agregar(ComponenteSistema c) { hijos.add(c); }
+    
+    public void mostrarDatos() {
+        System.out.println("[Carpeta Principal]");
+        for(ComponenteSistema hijo : hijos) { 
+            hijo.mostrarDatos(); // Llamada recursiva uniforme
+        }
+    }
+}</code></pre>
+                    </div>
+                    <div class="mt-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Consola de Salida</span>
+                            <button onclick="ejecutarCodigo('composite', '[Carpeta Principal]\n  - Archivo.txt')" class="bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium py-1.5 px-4 rounded-lg transition-colors shadow-sm">
+                                Ejecutar
+                            </button>
+                        </div>
+                        <div id="out-composite" class="console-output text-sm text-gray-800 min-h-[1.5rem] whitespace-pre-wrap">Esperando ejecución...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SUB-PÁGINA 4: Decorator -->
+        <section id="page-decorator" class="page-section hidden fade-in">
+            <div class="bg-white rounded-3xl overflow-hidden card-shadow border border-gray-100 lg:flex lg:flex-row-reverse">
+                <div class="lg:w-1/3 bg-pastel-pink p-6 flex flex-col justify-center">
+                    <h2 class="text-3xl font-bold text-pink-900 mb-4">4. Decorator</h2>
+                    <div class="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <img src="decorator.png" alt="Ilustración del patrón Decorator" class="object-cover w-full h-full" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="image-placeholder w-full h-64 lg:h-full hidden">decorator.png</div>
+                    </div>
+                </div>
+                <div class="lg:w-2/3 p-6 sm:p-10">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold mb-2">Explicación del Código</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm sm:text-base">
+                            <strong>¿Qué hace?</strong> Partimos de un `CafeBasico`. El `DecoradorLeche` "envuelve" a este café. Cuando llamamos a `preparar()`, el decorador primero ejecuta el método del café base y luego le añade su propia característica (" + Leche").<br><br>
+                            <strong>¿Cómo aplica el patrón?</strong> Evita crear cientos de subclases (como `CafeConLecheYAzucar`). En su lugar, añadimos responsabilidades al objeto en tiempo de ejecución de manera dinámica y escalable. Envolvemos la base tantas veces como queramos con diferentes ingredientes.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gray-900 rounded-xl overflow-hidden">
+<pre><code class="language-java">interface Cafe { String preparar(); }
+
+class CafeBasico implements Cafe {
+    public String preparar() { return "Café base"; }
+}
+
+abstract class CafeDecorador implements Cafe {
+    protected Cafe cafeBase;
+    CafeDecorador(Cafe c) { this.cafeBase = c; }
+}
+
+class DecoradorLeche extends CafeDecorador {
+    DecoradorLeche(Cafe c) { super(c); }
+    public String preparar() { 
+        // Llama a la base y agrega su comportamiento
+        return cafeBase.preparar() + " + Leche"; 
+    }
+}</code></pre>
+                    </div>
+                    <div class="mt-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Consola de Salida</span>
+                            <button onclick="ejecutarCodigo('decorator', 'Café base + Leche')" class="bg-pink-600 hover:bg-pink-700 text-white text-sm font-medium py-1.5 px-4 rounded-lg transition-colors shadow-sm">
+                                Ejecutar
+                            </button>
+                        </div>
+                        <div id="out-decorator" class="console-output text-sm text-gray-800 min-h-[1.5rem] whitespace-pre-wrap">Esperando ejecución...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SUB-PÁGINA 5: Facade -->
+        <section id="page-facade" class="page-section hidden fade-in">
+            <div class="bg-white rounded-3xl overflow-hidden card-shadow border border-gray-100 lg:flex">
+                <div class="lg:w-1/3 bg-pastel-purple p-6 flex flex-col justify-center">
+                    <h2 class="text-3xl font-bold text-purple-900 mb-4">5. Facade</h2>
+                    <div class="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <img src="facade.png" alt="Ilustración del patrón Facade" class="object-cover w-full h-full" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="image-placeholder w-full h-64 lg:h-full hidden">facade.png</div>
+                    </div>
+                </div>
+                <div class="lg:w-2/3 p-6 sm:p-10">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold mb-2">Explicación del Código</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm sm:text-base">
+                            <strong>¿Qué hace?</strong> Tenemos subsistemas complejos (`Luces`, `Proyector`). El cliente no interactúa directamente con ellos. En su lugar, llama al método `modoPelicula()` de la clase `CineEnCasaFacade`, que se encarga de coordinar el apagado de luces y el encendido del proyector.<br><br>
+                            <strong>¿Cómo aplica el patrón?</strong> Proporciona una interfaz unificada, simple y de alto nivel. Oculta la complejidad de los subsistemas, haciendo que el sistema principal sea mucho más fácil de utilizar y entender para el cliente final.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gray-900 rounded-xl overflow-hidden">
+<pre><code class="language-java">// Subsistemas complejos
+class Luces { void apagar() { System.out.println("Luces apagadas"); } }
+class Proyector { void encender() { System.out.println("Proyector encendido"); } }
+
+// La Fachada (Facade)
+class CineEnCasaFacade {
+    Luces luces = new Luces();
+    Proyector proyector = new Proyector();
+    
+    // Método simplificado para el cliente
+    void modoPelicula() {
+        luces.apagar();
+        proyector.encender();
+    }
+}</code></pre>
+                    </div>
+                    <div class="mt-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Consola de Salida</span>
+                            <button onclick="ejecutarCodigo('facade', 'Luces apagadas\nProyector encendido')" class="bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium py-1.5 px-4 rounded-lg transition-colors shadow-sm">
+                                Ejecutar
+                            </button>
+                        </div>
+                        <div id="out-facade" class="console-output text-sm text-gray-800 min-h-[1.5rem] whitespace-pre-wrap">Esperando ejecución...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer vacío según lo solicitado -->
+    <footer class="bg-white border-t border-gray-200 mt-auto py-6">
+        <div class="max-w-5xl mx-auto px-4 text-center">
+            <!-- Footer limpio -->
+        </div>
+    </footer>
+
+    <!-- Lógica JavaScript para Pestañas y simulación -->
+    <script>
+        // Función para manejar el cambio de pestañas (sub-páginas)
+        function showPage(pageId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.page-section').forEach(el => {
+                el.classList.add('hidden');
+            });
+            
+            // Quitar estilos activos de todos los botones
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('bg-teal-600', 'text-white', 'shadow-md');
+                el.classList.add('text-gray-600', 'hover:bg-gray-100');
+            });
+
+            // Mostrar la sección seleccionada
+            document.getElementById('page-' + pageId).classList.remove('hidden');
+            
+            // Añadir estilos activos al botón seleccionado
+            const activeBtn = document.getElementById('btn-' + pageId);
+            activeBtn.classList.remove('text-gray-600', 'hover:bg-gray-100');
+            activeBtn.classList.add('bg-teal-600', 'text-white', 'shadow-md');
+        }
+
+        // Función para simular la ejecución en consola
+        function ejecutarCodigo(id, resultado) {
+            const outputDiv = document.getElementById(`out-${id}`);
+            const btn = outputDiv.previousElementSibling.querySelector('button');
+            
+            // Efecto visual de "Procesando"
+            const originalText = btn.innerText;
+            btn.innerText = "Ejecutando...";
+            btn.classList.add('opacity-75');
+            outputDiv.innerHTML = '<span class="text-gray-400">Compilando e interactuando...</span>';
+            
+            // Simular un pequeño retraso para hacerlo realista
+            setTimeout(() => {
+                outputDiv.innerHTML = `<span class="text-green-600 font-bold">></span> ${resultado.replace(/\n/g, '<br><span class="text-green-600 font-bold">></span> ')}`;
+                btn.innerText = originalText;
+                btn.classList.remove('opacity-75');
+            }, 600);
+        }
+    </script>
+</body>
+</html>
